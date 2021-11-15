@@ -13,7 +13,7 @@
     "prebuild": "rimraf dist",
     "build": "npm-run-all -p build:*",
     "build:js": "tsc --module commonjs && cross-env NODE_ENV=production rollup -c",
-    "build:css": "sass --load-path='./' --no-source-map src/style/index.scss dist/slide-unlock.css",
+    "build:css": "sass --load-path='./' --no-source-map src/styles/index.scss dist/slide-unlock.css",
     "watch:js": "rollup -c -w",
     "watch:css": "npm run build:css -- --watch",
     "lint": "npm-run-all lint:*",
@@ -53,6 +53,7 @@
     "stylelint": "^13.12.0",
     "stylelint-config-prettier": "^8.0.2",
     "stylelint-config-twbs-bootstrap": "^2.1.0",
+    "tslib": "^2.3.1",
     "typescript": "^4.2.3"
   },
   "keywords": [],

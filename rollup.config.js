@@ -16,12 +16,7 @@ export default {
       file: pkg.main,
       name: pkg.name
         .split('-')
-        .map((item, index) => {
-          if (index > 0) {
-            return item.charAt(0).toUpperCase() + item.slice(1);
-          }
-          return item;
-        })
+        .map((item) => item.charAt(0).toUpperCase() + item.slice(1))
         .join(''),
       format: 'umd',
       sourcemap: true,
