@@ -30,6 +30,7 @@ export default {
     json(),
     commonjs(),
     nodeResolve(),
-    isDevelopment && serve({ open: true, contentBase: ['dist', 'public'] }),
+    isDevelopment &&
+      serve({ open: true, contentBase: ['public', 'dist', '.'] }),
   ].filter(Boolean),
 };
