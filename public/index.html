@@ -8,9 +8,14 @@
     <link rel="stylesheet" href="slide-unlock.css" />
   </head>
   <body>
+    <div id="app"></div>
+
     <script src="slide-unlock.umd.js"></script>
     <script>
-      new SlideUnlock().init()
+      const slideUnlock = new SlideUnlock();
+
+      slideUnlock.init();
+      slideUnlock.mount(app);
     </script>
   </body>
 </html>

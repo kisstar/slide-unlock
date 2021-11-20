@@ -1,3 +1,17 @@
+import { isObject } from './type-is';
+
+/**
+ * @public
+ * @function
+ * @name isEl
+ * @description 判断传入的一个值是否是一个元素
+ * @param value 需要检查的值
+ * @returns {boolean}
+ */
+export function isEl(value: any) {
+  return isObject(value) && value.nodeType === 1;
+}
+
 /**
  * @public
  * @function
@@ -6,11 +20,7 @@
  * @param {string} selectors 包含一个或多个要匹配的选择器的 DOM 字符串
  * @returns {Element | null} 如果找不到匹配项，则返回 null，否则返回对应的 Element
  */
-export const $ = (
-  selectors: string,
-): ReturnType<typeof document.querySelector> => {
-  return document.querySelector(selectors);
-};
+export const $ = document.querySelector;
 
 /**
  * @private

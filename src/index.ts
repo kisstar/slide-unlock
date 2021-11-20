@@ -1,4 +1,14 @@
-import { $, h, bindEvents, throttle, isFunction, unbindEvents } from './utils';
+import {
+  h,
+  bindEvents,
+  debounce,
+  isFunction,
+  unbindEvents,
+  isEl,
+  isString,
+  $,
+} from './utils';
+import { AnyFunction } from './types';
 
 /**
  * Class implement slide verification.
@@ -8,18 +18,36 @@ import { $, h, bindEvents, throttle, isFunction, unbindEvents } from './utils';
 export default class SlideUnlock {
   /**
    * 初始化滑块，处理配置
-   * @param {Element} el 挂载的元素
+   * @param {Element | string} el 挂载的元素或对应的选择器
    * @param {object} options 配置项
    */
-  constructor(el = 'body', options = {}) {
-    this.$el = $(el);
-    this.$isSuccess = false;
-    this.$options = {
-      tip: '请按住滑块，拖动到最右边',
-      unlockText: '验证成功',
+
+  private options: Options;
+
+  private succeeded: boolean;
+
+  private el?: HTMLElement;
+
+  private rootEl?: HTMLElement;
+
+  private bgEl?: HTMLElement;
+
+  private blockEl?: HTMLElement;
+
+  private textEl?: HTMLElement;
+
+  private timer = 0;
+
+  private debouncedHandleMouseMove?: typeof SlideUnlock.prototype.handleMouseMove;
+
+  constructor(options?: Options) {
+    this.options = {
+      placeholder: '请按住滑块，拖动到最右边',
+      message: '验证成功',
       duration: 500,
       ...options,
     };
+    this.succeeded = false;
   }
 
   /**
@@ -30,161 +58,46 @@ export default class SlideUnlock {
    * @returns {void}
    */
   init() {
-    this.$root = h('div', { class: 'slide-track' });
-    this.$bg = this.$root.appendChild(h('div', { class: 'slide-bg' }));
-    this.$block = this.$root.appendChild(h('div', { class: 'slide-block' }));
-    this.$text = this.$root.appendChild(
-      h('p', { class: 'slide-text' }, this.$options.tip),
+    this.rootEl = h('div', { class: 'slide-track' });
+    this.bgEl = this.rootEl.appendChild(h('div', { class: 'slide-bg' }));
+    this.blockEl = this.rootEl.appendChild(h('div', { class: 'slide-block' }));
+    this.textEl = this.rootEl.appendChild(
+      h('p', { class: 'slide-text' }, this.options.placeholder),
     );
-    this.$el.insertBefore(this.$root, this.$el.firstChild);
     this.bindEvents();
-  }
-
-  /**
-   * @private
-   * @method
-   * @name bindEvents
-   * @description 绑定鼠标的按下和松开事件
-   * @returns {void}
-   */
-  bindEvents() {
-    bindEvents(
-      'body',
-      'mousedown touchstart',
-      (this.$handleMouseDown = this.handleMouseDown.bind(this)),
-      this.$block,
-    );
-    bindEvents(
-      'body',
-      'mouseup touchend',
-      (this.$handleMouseUp = this.handleMouseUp.bind(this)),
-      document,
-    );
-  }
-
-  /**
-   * @private
-   * @method
-   * @name handleMouseDown
-   * @description 滑块上鼠标按下的监听器，主要记录鼠标的横坐标并指定滑块滑动的监听器
-   * @param {MouseEvent} e 一个基于 Event 的对象
-   * @returns {void}
-   */
-  handleMouseDown(e) {
-    const eve = e || window.event;
-    const downx = eve.clientX || e.changedTouches[0].clientX;
-
-    if (e.cancelable) {
-      e.preventDefault(); // 阻止默认行为
-    }
-
-    if (this.$isSuccess) {
-      return;
-    }
-
-    // 取消在手动滑动过程中的动画效果
-    this.$bg.style.transition = '';
-    this.$block.style.transition = '';
-
-    bindEvents(
-      'body',
-      'mousemove touchmove',
-      (this.$handleMouseMove = throttle(
-        this.handleMouseMove,
-        this,
-        undefined,
-        downx,
-      )),
-      this.$block,
-    );
-  }
-
-  /**
-   * @private
-   * @method
-   * @name handleMouseMove
-   * @description 滑块滑动的监听器，主要更新滑块位置和背景元素的宽度
-   * @param {MouseEvent} e 一个基于 Event 的对象
-   * @returns {void}
-   */
-  handleMouseMove(downx, e) {
-    const info = this.$block.getBoundingClientRect();
-    const x = e.clientX || e.changedTouches[0].clientX;
-    const y = e.clientY;
-    const x1 = info.left;
-    const y1 = info.top;
-    const x2 = info.right;
-    const y2 = info.bottom;
-    const moveX = x - downx;
-
-    if (this.$isSuccess) {
-      return;
-    }
-    if (moveX < 0) {
-      return;
-    }
-    if (x < x1 || x > x2 || y < y1 || y > y2) {
-      // 当鼠标移开滑块时取消移动
-      return;
-    }
-
-    this.$block.style.left = `${moveX}px`;
-    this.$bg.style.width = `${moveX}px`;
-
-    if (moveX >= this.$root.offsetWidth + x1 - x2) {
-      this.$isSuccess = true;
-      this.$text.textContent = this.$options.unlockText;
-      this.$text.style.cssText = `color: #fff; left: 0; right: ${this.$block.offsetWidth}px;`;
-      this.$block.classList.add('success');
-      if (isFunction(this.$options.cb)) {
-        // 为了避免阻塞成功提示界面的渲染，你可以设置两百毫秒左右的延迟
-        this.$options.cb.call(this);
-      }
-    }
-  }
-
-  /**
-   * @private
-   * @method
-   * @name handleMouseUp
-   * @description 鼠标松开的监听器，主要用于重置
-   * @param {MouseEvent} e 一个基于 Event 的对象
-   * @returns {void}
-   */
-  handleMouseUp() {
-    clearTimeout(this.$tId);
-    unbindEvents(
-      'body',
-      'mousemove touchmove',
-      this.$handleMouseMove,
-      this.$block,
-    );
-
-    if (this.$isSuccess) {
-      unbindEvents('body', 'mouseup touchend', this.$handleMouseUp, document);
-      unbindEvents(
-        'body',
-        'mousedown touchstart',
-        this.$handleMouseDown,
-        this.$block,
-      );
-      return;
-    }
-
-    // 给重置过程添加动画效果
-    this.$bg.style.cssText = `transition: width ${this.$options.duration}ms ease; width: 0;`;
-    this.$block.style.cssText = `transition: left ${this.$options.duration}ms ease; left: 0;`;
   }
 
   /**
    * @public
    * @method
-   * @name isSuccess
+   * @name isSucceeded
+   * @description 返回当前滑块的状态
+   * @param {string | HTMLElement} el 挂载点，可以是一个元素或者一个 CSS 选择器
+   * @returns {void}
+   */
+  mount(el: keyof HTMLElementTagNameMap | HTMLElement) {
+    if (isEl(el)) {
+      this.el = el as HTMLElement;
+    } else if (isString(el)) {
+      this.el = $(el as keyof HTMLElementTagNameMap) as HTMLElement;
+    }
+
+    if (!this.el || !this.rootEl) {
+      return;
+    }
+
+    this.el.insertBefore(this.rootEl, this.el.firstChild);
+  }
+
+  /**
+   * @public
+   * @method
+   * @name isSucceeded
    * @description 返回当前滑块的状态
    * @returns {boolean}
    */
-  isSuccess() {
-    return this.$isSuccess;
+  isSucceeded() {
+    return this.succeeded;
   }
 
   /**
@@ -195,15 +108,171 @@ export default class SlideUnlock {
    * @returns {void}
    */
   reset() {
-    if (!this.$isSuccess) {
+    if (!this.succeeded || !this.bgEl || !this.blockEl || !this.textEl) {
       return;
     }
-    this.$isSuccess = false;
-    this.$bg.style.cssText = `transition: width ${this.$options.duration}ms ease; width: 0;`;
-    this.$block.style.cssText = `transition: left ${this.$options.duration}ms ease; left: 0;`;
-    this.$text.style.cssText = `color: #5f5f5f; left: ${this.$block.offsetWidth}px; right: 0;`;
-    this.$text.textContent = this.$options.tip;
-    this.$block.classList.remove('success');
+
+    this.succeeded = false;
+    this.bgEl.style.cssText = `transition: width ${this.options.duration}ms ease; width: 0;`;
+    this.blockEl.style.cssText = `transition: left ${this.options.duration}ms ease; left: 0;`;
+    this.textEl.style.cssText = `color: #5f5f5f; left: ${this.blockEl.offsetWidth}px; right: 0;`;
+    this.textEl.textContent = this.options.placeholder || '';
+    this.blockEl.classList.remove('success');
     this.bindEvents();
   }
+
+  /**
+   * @private
+   * @method
+   * @name bindEvents
+   * @description 绑定鼠标的按下和松开事件
+   * @returns {void}
+   */
+  private bindEvents() {
+    if (!this.blockEl) {
+      return;
+    }
+
+    bindEvents(this.blockEl, 'mousedown touchstart', this.handleMouseDown);
+    bindEvents(document, 'mouseup touchend', this.handleMouseUp);
+  }
+
+  /**
+   * @private
+   * @method
+   * @name handleMouseDown
+   * @description 滑块上鼠标按下的监听器，主要记录鼠标的横坐标并指定滑块滑动的监听器
+   * @param {MouseEvent | TouchEvent} eve 一个基于 Event 的对象
+   * @returns {void}
+   */
+  private handleMouseDown: (
+    this: SlideUnlock,
+    eve: MouseEvent | TouchEvent,
+  ) => void = (eve) => {
+    if (!this.bgEl || !this.blockEl) {
+      return;
+    }
+
+    const downx =
+      (eve as MouseEvent).clientX ||
+      (eve as TouchEvent).changedTouches[0].clientX;
+
+    if (eve.cancelable) {
+      eve.preventDefault(); // 阻止默认行为
+    }
+
+    if (this.succeeded) {
+      return;
+    }
+
+    // 取消在手动滑动过程中的动画效果
+    this.bgEl.style.transition = '';
+    this.blockEl.style.transition = '';
+
+    bindEvents(
+      this.blockEl,
+      'mousemove touchmove',
+      (this.debouncedHandleMouseMove = debounce(
+        this.handleMouseMove,
+        this,
+        4,
+        downx,
+      )),
+    );
+  };
+
+  /**
+   * @private
+   * @method
+   * @name handleMouseMove
+   * @description 滑块滑动的监听器，主要更新滑块位置和背景元素的宽度
+   * @param {number} downx 事件发生时的应用客户端区域的水平坐标
+   * @param {MouseEvent | TouchEvent} eve 一个基于 Event 的对象
+   * @returns {void}
+   */
+  private handleMouseMove = (downx: number, eve: MouseEvent | TouchEvent) => {
+    if (
+      this.succeeded ||
+      !this.rootEl ||
+      !this.blockEl ||
+      !this.bgEl ||
+      !this.textEl
+    ) {
+      return;
+    }
+
+    const info = this.blockEl.getBoundingClientRect();
+    const x =
+      (eve as MouseEvent).clientX ||
+      (eve as TouchEvent).changedTouches[0].clientX;
+    const y =
+      (eve as MouseEvent).clientY ||
+      (eve as TouchEvent).changedTouches[0].clientY;
+    const x1 = info.left;
+    const y1 = info.top;
+    const x2 = info.right;
+    const y2 = info.bottom;
+    const moveX = x - downx;
+
+    if (moveX < 0) {
+      return;
+    }
+    if (x < x1 || x > x2 || y < y1 || y > y2) {
+      // 当鼠标移开滑块时取消移动
+      return;
+    }
+
+    this.blockEl.style.left = `${moveX}px`;
+    this.bgEl.style.width = `${moveX}px`;
+
+    if (moveX >= this.rootEl.offsetWidth + x1 - x2) {
+      this.succeeded = true;
+      this.textEl.textContent = this.options.message || '';
+      this.textEl.style.cssText = `color: #fff; left: 0; right: ${this.blockEl.offsetWidth}px;`;
+      this.blockEl.classList.add('success');
+
+      if (isFunction(this.options.cb)) {
+        // 为了避免阻塞成功提示界面的渲染，你可以设置两百毫秒左右的延迟
+        (this.options.cb as AnyFunction).call(this);
+      }
+    }
+  };
+
+  /**
+   * @private
+   * @method
+   * @name handleMouseUp
+   * @description 鼠标松开的监听器，主要用于重置
+   * @param {MouseEvent} eve 一个基于 Event 的对象
+   * @returns {void}
+   */
+  private handleMouseUp = () => {
+    if (!this.blockEl || !this.bgEl || !this.debouncedHandleMouseMove) {
+      return;
+    }
+
+    clearTimeout(this.timer);
+    unbindEvents(
+      this.blockEl,
+      'mousemove touchmove',
+      this.debouncedHandleMouseMove,
+    );
+
+    if (this.succeeded) {
+      unbindEvents(this.blockEl, 'mousedown touchstart', this.handleMouseDown);
+      unbindEvents(document, 'mouseup touchend', this.handleMouseUp);
+      return;
+    }
+
+    // 给重置过程添加动画效果
+    this.bgEl.style.cssText = `transition: width ${this.options.duration}ms ease; width: 0;`;
+    this.blockEl.style.cssText = `transition: left ${this.options.duration}ms ease; left: 0;`;
+  };
+}
+
+interface Options {
+  placeholder?: string;
+  message?: string;
+  duration?: number;
+  cb?: AnyFunction;
 }
