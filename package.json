@@ -1,10 +1,10 @@
 {
-  "name": "slide-unlock",
+  "name": "@kisstar/slide-unlock",
   "version": "0.0.1",
   "description": "A JavaScript library that provides sliding unlocking.",
   "main": "dist/slide-unlock.umd.js",
   "module": "dist/slide-unlock.es.js",
-  "typings": "dist/types/slide-unlock.d.ts",
+  "typings": "dist/types/index.d.ts",
   "files": [
     "dist"
   ],
@@ -22,7 +22,13 @@
     "lint:prettier": "prettier --check \"src/**\"",
     "prepare": "husky install",
     "commit": "git-cz",
+    "prerelease": "npm run build",
     "release": "standard-version"
+  },
+  "homepage": "https://github.com/kisstar/slide-unlock#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kisstar/slide-unlock.git"
   },
   "dependencies": {},
   "devDependencies": {
@@ -56,7 +62,13 @@
     "tslib": "^2.3.1",
     "typescript": "^4.2.3"
   },
-  "keywords": [],
+  "author": "kisstar <dwh.chn@foxmail.com>",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  },
+  "keywords": [
+    "slide-unlock"
+  ],
   "lint-staged": {
     "./src/*.{js,ts}": "eslint",
     "./src/*.{css,scss}": "stylelint --syntax=scss",

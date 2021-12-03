@@ -2,6 +2,21 @@
 
 A JavaScript library that provides sliding unlocking.
 
+## Usage
+
+```html
+<div id="mount-point"></div>
+
+<script>
+  import SlideUnlock from '@kisstar/slide-unlock';
+
+  const slideUnlock = new SlideUnlock();
+
+  slideUnlock.init();
+  slideUnlock.mount('#mount-point');
+</script>
+```
+
 ## Development scripts
 
 ```bash
