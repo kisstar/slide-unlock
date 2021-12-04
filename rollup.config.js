@@ -15,6 +15,7 @@ export default {
     {
       file: pkg.main,
       name: pkg.name
+        .split('/')[1]
         .split('-')
         .map((item) => item.charAt(0).toUpperCase() + item.slice(1))
         .join(''),

@@ -12,7 +12,9 @@
 
     <script src="slide-unlock.umd.js"></script>
     <script>
-      const slideUnlock = new SlideUnlock();
+      const slideUnlock = new SlideUnlock({
+        prefix: 'ks',
+      });
 
       slideUnlock.init();
       slideUnlock.mount(app);

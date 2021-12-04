@@ -1,6 +1,6 @@
 @import './variable.scss';
 
-.slide-track {
+.#{$prefix}-slide-track {
   &,
   * {
     margin: 0;
@@ -13,7 +13,7 @@
   height: $track-height;
   background-color: $track-bg;
 
-  .slide-block {
+  .#{$prefix}-slide-block {
     z-index: 999;
     position: absolute;
     top: 0;
@@ -32,7 +32,7 @@
       content: '»';
     }
 
-    &.success::after {
+    &.#{$prefix}-slide-success::after {
       content: '√';
       display: block;
       position: absolute;
@@ -48,7 +48,7 @@
     }
   }
 
-  .slide-text {
+  .#{$prefix}-slide-text {
     position: absolute;
     left: $block-width;
     right: 0;
@@ -60,7 +60,7 @@
     color: $slide-text;
   }
 
-  .slide-bg {
+  .#{$prefix}-slide-bg {
     position: absolute;
     top: 0;
     bottom: 0;

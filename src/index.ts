@@ -42,9 +42,10 @@ export default class SlideUnlock {
 
   constructor(options?: Options) {
     this.options = {
-      placeholder: '请按住滑块，拖动到最右边',
-      message: '验证成功',
+      placeholder: 'Please drag the slider to the right',
+      message: 'Validation succeeded',
       duration: 500,
+      prefix: '',
       ...options,
     };
     this.succeeded = false;
@@ -58,11 +59,17 @@ export default class SlideUnlock {
    * @returns {void}
    */
   init() {
-    this.rootEl = h('div', { class: 'slide-track' });
-    this.bgEl = this.rootEl.appendChild(h('div', { class: 'slide-bg' }));
-    this.blockEl = this.rootEl.appendChild(h('div', { class: 'slide-block' }));
+    const classPrefix = this.options.prefix ? `${this.options.prefix}-` : '';
+
+    this.rootEl = h('div', { class: `${classPrefix}slide-track` });
+    this.bgEl = this.rootEl.appendChild(
+      h('div', { class: `${classPrefix}slide-bg` }),
+    );
+    this.blockEl = this.rootEl.appendChild(
+      h('div', { class: `${classPrefix}slide-block` }),
+    );
     this.textEl = this.rootEl.appendChild(
-      h('p', { class: 'slide-text' }, this.options.placeholder),
+      h('p', { class: `${classPrefix}slide-text` }, this.options.placeholder),
     );
     this.bindEvents();
   }
@@ -231,9 +238,9 @@ export default class SlideUnlock {
       this.textEl.style.cssText = `color: #fff; left: 0; right: ${this.blockEl.offsetWidth}px;`;
       this.blockEl.classList.add('success');
 
-      if (isFunction(this.options.cb)) {
+      if (isFunction(this.options.onSuccess)) {
         // 为了避免阻塞成功提示界面的渲染，你可以设置两百毫秒左右的延迟
-        (this.options.cb as AnyFunction).call(this);
+        (this.options.onSuccess as AnyFunction).call(this);
       }
     }
   };
@@ -274,5 +281,6 @@ interface Options {
   placeholder?: string;
   message?: string;
   duration?: number;
-  cb?: AnyFunction;
+  prefix?: string;
+  onSuccess?: AnyFunction;
 }
