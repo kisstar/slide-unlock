@@ -3,6 +3,7 @@ import json from '@rollup/plugin-json';
 import commonjs from '@rollup/plugin-commonjs';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import serve from 'rollup-plugin-serve';
+import livereload from 'rollup-plugin-livereload';
 import pkg from './package.json';
 
 const isProduction = process.env.NODE_ENV === 'production';
@@ -24,14 +25,15 @@ export default {
     },
   ].filter(Boolean),
   watch: {
-    include: 'src/',
+    include: 'src/**/*.ts',
   },
   plugins: [
+    isDevelopment &&
+      serve({ open: true, contentBase: ['public', 'dist', '.'] }),
     typescript(),
     json(),
     commonjs(),
     nodeResolve(),
-    isDevelopment &&
-      serve({ open: true, contentBase: ['public', 'dist', '.'] }),
+    livereload(),
   ].filter(Boolean),
 };
