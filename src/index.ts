@@ -43,7 +43,7 @@ export default class SlideUnlock {
   constructor(options?: Options) {
     this.options = {
       placeholder: 'Please drag the slider to the right',
-      message: 'Validation succeeded',
+      message: 'Unlock succeeded',
       duration: 500,
       prefix: '',
       ...options,
@@ -119,12 +119,14 @@ export default class SlideUnlock {
       return;
     }
 
+    const { placeholder = '', duration, prefix } = this.options;
+
     this.succeeded = false;
-    this.bgEl.style.cssText = `transition: width ${this.options.duration}ms ease; width: 0;`;
-    this.blockEl.style.cssText = `transition: left ${this.options.duration}ms ease; left: 0;`;
+    this.bgEl.style.cssText = `transition: width ${duration}ms ease; width: 0;`;
+    this.blockEl.style.cssText = `transition: left ${duration}ms ease; left: 0;`;
     this.textEl.style.cssText = `color: #5f5f5f; left: ${this.blockEl.offsetWidth}px; right: 0;`;
-    this.textEl.textContent = this.options.placeholder || '';
-    this.blockEl.classList.remove('success');
+    this.textEl.textContent = placeholder;
+    this.blockEl.classList.remove(`${prefix ? `${prefix}-` : ''}slide-success`);
     this.bindEvents();
   }
 
@@ -208,6 +210,7 @@ export default class SlideUnlock {
       return;
     }
 
+    const { prefix, message = '', onSuccess } = this.options;
     const info = this.blockEl.getBoundingClientRect();
     const x =
       (eve as MouseEvent).clientX ||
@@ -234,13 +237,13 @@ export default class SlideUnlock {
 
     if (moveX >= this.rootEl.offsetWidth + x1 - x2) {
       this.succeeded = true;
-      this.textEl.textContent = this.options.message || '';
+      this.textEl.textContent = message;
       this.textEl.style.cssText = `color: #fff; left: 0; right: ${this.blockEl.offsetWidth}px;`;
-      this.blockEl.classList.add('success');
+      this.blockEl.classList.add(`${prefix ? `${prefix}-` : ''}slide-success`);
 
-      if (isFunction(this.options.onSuccess)) {
+      if (isFunction(onSuccess)) {
         // 为了避免阻塞成功提示界面的渲染，你可以设置两百毫秒左右的延迟
-        (this.options.onSuccess as AnyFunction).call(this);
+        (onSuccess as AnyFunction).call(this);
       }
     }
   };
