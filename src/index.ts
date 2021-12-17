@@ -59,9 +59,13 @@ export default class SlideUnlock {
    * @returns {void}
    */
   init() {
-    const classPrefix = this.options.prefix ? `${this.options.prefix}-` : '';
+    const { prefix, width, height } = this.options;
+    const classPrefix = prefix ? `${prefix}-` : '';
 
-    this.rootEl = h('div', { class: `${classPrefix}slide-track` });
+    this.rootEl = h('div', {
+      class: `${classPrefix}slide-track`,
+      style: `width: ${width || '100%'}; height: ${height || '100%'};`,
+    });
     this.bgEl = this.rootEl.appendChild(
       h('div', { class: `${classPrefix}slide-bg` }),
     );
@@ -285,5 +289,7 @@ interface Options {
   message?: string;
   duration?: number;
   prefix?: string;
+  width?: string;
+  height?: string;
   onSuccess?: AnyFunction;
 }
