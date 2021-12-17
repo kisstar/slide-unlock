@@ -1,14 +1,24 @@
 $prefix: 'ks' !default;
 
-$track-height: 32px;
-$block-width: 45px;
-$slide-pc-size: 18px;
+$white: #fff !default;
+$green: #7cc13c !default;
 
-$block-text: #afafaf;
-$block-pc-text: #fff;
-$slide-text: #5f5f5f;
+// Color
+$track_bg-color: #e8e8e8 !default;
 
-$track-bg: #e8e8e8;
-$block-bg: #fff;
-$block-bd: #ccc;
-$bg-success: #7cc13c;
+$slide_text-color: #999 !default;
+$slide-success_bg-color: $green !default;
+
+$block_text-color: #5f5f5f !default;
+$block_bg-color: $white !default;
+$block_bd-color: #ccc !default;
+$block-pc_text-color: $white !default;
+
+// Size
+$track_height: 32px !default;
+$slide-pc_width: 24px !default;
+$block_width: 32px !default;
+
+// Z-Index
+$block_z-index: 2 !default;
+$slide-text_z-index: 1 !default;

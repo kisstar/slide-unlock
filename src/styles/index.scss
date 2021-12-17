@@ -9,23 +9,21 @@
   }
 
   position: relative;
-  width: 300px;
-  height: $track-height;
-  background-color: $track-bg;
+  height: $track_height;
+  line-height: $track_height;
+  background-color: $track_bg-color;
 
   .#{$prefix}-slide-block {
-    z-index: 999;
     position: absolute;
     top: 0;
     bottom: 0;
     left: 0;
-    width: $block-width;
-    height: $track-height;
-    line-height: $track-height;
+    width: $block_width;
     text-align: center;
-    color: $block-text;
-    background: $block-bg;
-    border: 1px solid $block-bd;
+    color: $block_text-color;
+    background: $block_bg-color;
+    border: 1px solid $block_bd-color;
+    z-index: $block_z-index;
     cursor: move;
 
     &::after {
@@ -39,25 +37,22 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      width: $slide-pc-size;
-      height: $slide-pc-size;
-      line-height: $slide-pc-size;
-      color: $block-pc-text;
+      width: $slide-pc_width;
+      height: 80%;
+      color: $block-pc_text-color;
+      background: $slide-success_bg-color;
       border-radius: 50%;
-      background: $bg-success;
     }
   }
 
   .#{$prefix}-slide-text {
     position: absolute;
-    left: $block-width;
     right: 0;
-    z-index: 99;
+    left: $block_width;
     margin: 0;
-    line-height: $track-height;
-    font-size: 14px;
     text-align: center;
-    color: $slide-text;
+    color: $slide_text-color;
+    z-index: $slide-text_z-index;
   }
 
   .#{$prefix}-slide-bg {
@@ -65,7 +60,6 @@
     top: 0;
     bottom: 0;
     left: 0;
-    width: $block-width;
-    background: $bg-success;
+    background: $slide-success_bg-color;
   }
 }
