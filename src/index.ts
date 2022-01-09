@@ -45,7 +45,7 @@ export default class SlideUnlock {
       placeholder: 'Please drag the slider to the right',
       message: 'Unlock succeeded',
       duration: 500,
-      prefix: '',
+      prefix: 'ks',
       ...options,
     };
     this.succeeded = false;
@@ -64,7 +64,7 @@ export default class SlideUnlock {
 
     this.rootEl = h('div', {
       class: `${classPrefix}slide-track`,
-      style: `width: ${width || '100%'}; height: ${height || '100%'};`,
+      style: `width: ${width || '100%'};${height ? ` height: ${height};` : ''}`,
     });
     this.bgEl = this.rootEl.appendChild(
       h('div', { class: `${classPrefix}slide-bg` }),
@@ -214,7 +214,7 @@ export default class SlideUnlock {
       return;
     }
 
-    const { prefix, message = '', onSuccess } = this.options;
+    const { prefix, message = '', success } = this.options;
     const info = this.blockEl.getBoundingClientRect();
     const x =
       (eve as MouseEvent).clientX ||
@@ -245,9 +245,9 @@ export default class SlideUnlock {
       this.textEl.style.cssText = `color: #fff; left: 0; right: ${this.blockEl.offsetWidth}px;`;
       this.blockEl.classList.add(`${prefix ? `${prefix}-` : ''}slide-success`);
 
-      if (isFunction(onSuccess)) {
+      if (isFunction(success)) {
         // 为了避免阻塞成功提示界面的渲染，你可以设置两百毫秒左右的延迟
-        (onSuccess as AnyFunction).call(this);
+        (success as AnyFunction).call(this);
       }
     }
   };
@@ -291,5 +291,5 @@ interface Options {
   prefix?: string;
   width?: string;
   height?: string;
-  onSuccess?: AnyFunction;
+  success?: AnyFunction;
 }
