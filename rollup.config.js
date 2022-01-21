@@ -34,6 +34,6 @@ export default {
     json(),
     commonjs(),
     nodeResolve(),
-    livereload(),
+    isDevelopment && livereload(),
   ].filter(Boolean),
 };
