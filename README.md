@@ -1,6 +1,6 @@
 # slide-unlock
 
-![Demo](./public/images/demo.png)
+![Demo](https://github.com/kisstar/slide-unlock/blob/main/public/images/demo.png?raw=true)
 
 A JavaScript library that provides sliding unlocking.
 
