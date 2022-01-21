@@ -1,6 +1,6 @@
 {
   "name": "@kisstar/slide-unlock",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "A JavaScript library that provides sliding unlocking.",
   "main": "dist/slide-unlock.umd.js",
   "module": "dist/slide-unlock.es.js",
